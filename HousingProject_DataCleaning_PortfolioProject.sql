@@ -187,3 +187,49 @@ DROP COLUMN OwnerAddress, TaxDistrict, PropertyAddress
 
 ALTER TABLE HousingProject.dbo.NashvilleHousing
 DROP COLUMN OwnerAddress, TaxDistrict, PropertyAddress
+
+-------------------------------------------------------------------------------------------------------------------
+
+--- Importing Data using OPENROWSET and BULK INSERT	
+
+
+sp_configure 'show advanced options', 1;
+RECONFIGURE;
+GO
+sp_configure 'Ad Hoc Distributed Queries', 1;
+RECONFIGURE;
+GO
+
+
+USE HousingProject 
+
+GO 
+
+EXEC master.dbo.sp_MSset_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'AllowInProcess', 1 
+
+GO 
+
+EXEC master.dbo.sp_MSset_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'DynamicParameters', 1 
+
+GO 
+
+
+---- Using BULK INSERT
+
+USE HousingProject;
+GO
+BULK INSERT NashvilleHousing FROM 'C:\Users\alexa\Documents\SQL Server Management Studio\New folder\HousingProject_DataCleaning_PortfolioProject.csv'
+   WITH (
+      FIELDTERMINATOR = ',',
+      ROWTERMINATOR = '\n'
+);
+GO
+
+
+--Using OPENROWSET
+USE PortfolioProject;
+GO
+SELECT * INTO NashvilleHousing
+FROM OPENROWSET('Microsoft.ACE.OLEDB.12.0',
+    'Excel 12.0; Database=C:\Users\alexa\Documents\SQL Server Management Studio\New folder\HousingProject_DataCleaning_PortfolioProject.csv', [Sheet1$]);
+GO
